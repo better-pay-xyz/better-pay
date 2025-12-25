@@ -9,6 +9,7 @@ export const merchants = pgTable('merchants', {
   email: text('email').notNull().unique(),
   emailVerified: boolean('email_verified').notNull().default(false),
   passwordHash: text('password_hash'), // Null if OAuth only
+  apiKeyHash: text('api_key_hash').notNull(),
   tempoAddress: text('tempo_address'), // Can be set later
   webhookUrl: text('webhook_url'),
   webhookSecret: text('webhook_secret'),
