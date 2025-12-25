@@ -20,12 +20,19 @@ A Stripe-like payment SaaS built on Tempo blockchain, enabling merchants to acce
 
 **Components**:
 
-1. **Frontend Layer**
-   - Merchant Dashboard (Next.js 15)
-   - Checkout Pages (Next.js 15 + Passkey auth)
+1. **Merchant Dashboard** (Next.js 16)
+   - tRPC Server (API Routes) - Internal admin functions
+   - tRPC Client (React) - Type-safe frontend
+   - Direct database access via Drizzle
+   - Better Auth integration
 
-2. **Backend Service** (Hono + Bun)
-   - RESTful API
+2. **Checkout Pages** (Next.js 16)
+   - Passkey authentication
+   - Payment UI
+   - Direct database access for order lookup
+
+3. **Backend API Service** (Hono + Node.js 20+)
+   - REST API only (public merchant API)
    - Payment engine
    - Subscription scheduler
    - Webhook service
