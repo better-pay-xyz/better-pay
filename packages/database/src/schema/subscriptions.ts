@@ -15,7 +15,7 @@ export const subscriptionPlans = pgTable('subscription_plans', {
     .$defaultFn(() => `plan_${createId()}`),
   merchantId: text('merchant_id')
     .notNull()
-    .references(() => merchants.id),
+    .references(() => merchants.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
   amount: text('amount').notNull(),
   currency: text('currency').notNull(),
@@ -31,13 +31,13 @@ export const subscriptions = pgTable('subscriptions', {
     .$defaultFn(() => `sub_${createId()}`),
   merchantId: text('merchant_id')
     .notNull()
-    .references(() => merchants.id),
+    .references(() => merchants.id, { onDelete: 'cascade' }),
   customerId: text('customer_id')
     .notNull()
-    .references(() => customers.id),
+    .references(() => customers.id, { onDelete: 'cascade' }),
   planId: text('plan_id')
     .notNull()
-    .references(() => subscriptionPlans.id),
+    .references(() => subscriptionPlans.id, { onDelete: 'cascade' }),
   amount: text('amount').notNull(),
   currency: text('currency').notNull(),
   interval: text('interval').notNull().$type<SubscriptionInterval>(),

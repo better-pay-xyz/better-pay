@@ -12,14 +12,14 @@ export const payments = pgTable('payments', {
   id: text('id')
     .primaryKey()
     .$defaultFn(() => `pay_${createId()}`),
-  orderId: text('order_id').references(() => orders.id),
-  subscriptionId: text('subscription_id').references(() => subscriptions.id),
+  orderId: text('order_id').references(() => orders.id, { onDelete: 'set null' }),
+  subscriptionId: text('subscription_id').references(() => subscriptions.id, { onDelete: 'set null' }),
   merchantId: text('merchant_id')
     .notNull()
-    .references(() => merchants.id),
+    .references(() => merchants.id, { onDelete: 'cascade' }),
   customerId: text('customer_id')
     .notNull()
-    .references(() => customers.id),
+    .references(() => customers.id, { onDelete: 'cascade' }),
   amount: text('amount').notNull(),
   currency: text('currency').notNull(),
   txHash: text('tx_hash').notNull(),

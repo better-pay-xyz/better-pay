@@ -11,7 +11,7 @@ export const orders = pgTable('orders', {
     .$defaultFn(() => `ord_${createId()}`),
   merchantId: text('merchant_id')
     .notNull()
-    .references(() => merchants.id),
+    .references(() => merchants.id, { onDelete: 'cascade' }),
   amount: text('amount').notNull(),
   currency: text('currency').notNull(),
   memo: text('memo').notNull().unique(),
