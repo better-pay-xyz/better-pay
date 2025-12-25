@@ -1,0 +1,11 @@
+{
+  "name": "@better-pay/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "forge build",
+    "test": "forge test -vvv",
+    "deploy:testnet": "forge script script/Deploy.s.sol:DeployScript --rpc-url tempo-testnet --broadcast --verify",
+    "clean": "forge clean"
+  }
+}
