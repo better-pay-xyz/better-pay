@@ -733,10 +733,10 @@ async function verifyPayment(orderId: string, txHash: string) {
 - Forms: React Hook Form + Zod
 
 **Backend**
-- Runtime: Bun
+- Runtime: Node.js 20+
 - Framework: Hono
 - ORM: Drizzle ORM
-- Queue: Bun's built-in cron (no Redis for MVP)
+- Queue: Node-cron (no Redis for MVP)
 - Logging: Pino
 
 **Database**
