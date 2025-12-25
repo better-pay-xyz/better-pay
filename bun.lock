@@ -33,6 +33,28 @@
         "vitest": "^1.1.0",
       },
     },
+    "apps/checkout": {
+      "name": "@better-pay/checkout",
+      "version": "0.1.0",
+      "dependencies": {
+        "@better-pay/shared": "workspace:*",
+        "@tanstack/react-query": "^5.17.0",
+        "next": "^15.0.0",
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0",
+        "viem": "^2.0.0",
+        "zustand": "^4.4.7",
+      },
+      "devDependencies": {
+        "@types/node": "^20.10.0",
+        "@types/react": "^19.0.0",
+        "@types/react-dom": "^19.0.0",
+        "autoprefixer": "^10.4.16",
+        "postcss": "^8.4.32",
+        "tailwindcss": "^3.4.0",
+        "typescript": "^5.3.3",
+      },
+    },
     "apps/dashboard": {
       "name": "@better-pay/dashboard",
       "version": "0.1.0",
@@ -97,6 +119,8 @@
     "@better-fetch/fetch": ["@better-fetch/fetch@1.1.21", "", {}, "sha512-/ImESw0sskqlVR94jB+5+Pxjf+xBwDZF/N5+y2/q4EqD7IARUTSpPfIo8uf39SYpCxyOCtbyYpUrZ3F/k0zT4A=="],
 
     "@better-pay/api": ["@better-pay/api@workspace:apps/api"],
+
+    "@better-pay/checkout": ["@better-pay/checkout@workspace:apps/checkout"],
 
     "@better-pay/contracts": ["@better-pay/contracts@workspace:packages/contracts"],
 
