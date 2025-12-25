@@ -52,10 +52,52 @@ A Stripe-like payment SaaS built on Tempo blockchain, enabling merchants to acce
   id: string
   name: string
   email: string
+  emailVerified: boolean
   tempoAddress: string        // Receiving address
-  apiKey: string              // Encrypted
   webhookUrl?: string
   gasSponsored: boolean       // Pay gas for users
+  createdAt: timestamp
+  updatedAt: timestamp
+}
+```
+
+### ApiKey
+```typescript
+{
+  id: string
+  merchantId: string
+  name: string                // Key label (e.g., "Production", "Staging")
+  keyHash: string             // Hashed API key
+  keyPrefix: string           // First 10 chars for lookup
+  environment: enum           // test | live
+  lastUsedAt?: timestamp
+  createdAt: timestamp
+}
+```
+
+### Session (Better Auth)
+```typescript
+{
+  id: string
+  userId: string              // References merchant.id
+  expiresAt: timestamp
+  token: string
+  ipAddress?: string
+  userAgent?: string
+  createdAt: timestamp
+}
+```
+
+### Account (Better Auth - for OAuth)
+```typescript
+{
+  id: string
+  userId: string              // References merchant.id
+  accountId: string           // Provider's user ID
+  providerId: string          // "google", "github", etc.
+  accessToken?: string
+  refreshToken?: string
+  expiresAt?: timestamp
   createdAt: timestamp
 }
 ```
@@ -819,35 +861,66 @@ better-pay/
 
 ---
 
+## Authentication System
+
+### Merchant Authentication
+
+**Registration & Login:**
+- Email + Password (Better Auth)
+- Google OAuth (Better Auth)
+- Dev Mode: Click to bypass (development only)
+
+**API Key Management:**
+- Merchants generate API keys from Dashboard
+- Two environments: Test (`sk_test_xxx`) and Live (`sk_live_xxx`)
+- Keys are hashed and stored securely
+- Keys can be named, rotated, and revoked
+
+**Session Management:**
+- Better Auth handles sessions
+- JWT tokens stored in httpOnly cookies
+- Session expiry and refresh
+
+**Dev Mode:**
+```typescript
+// Only available when NODE_ENV=development
+if (process.env.NODE_ENV === 'development') {
+  // Show "Skip Auth (Dev Only)" button
+  // Creates temporary session without authentication
+}
+```
+
+---
+
 ## MVP Milestones
 
 ### Phase 1: Foundation (Week 1-2)
 - [ ] Setup monorepo with Bun Workspaces
 - [ ] Setup database (PostgreSQL + Drizzle)
 - [ ] Deploy smart contract to Tempo testnet
-- [ ] Basic merchant authentication
 
-### Phase 2: One-Time Payments (Week 3-4)
+### Phase 2: Merchant Auth & Dashboard (Week 3-4)
+- [ ] Integrate Better Auth
+- [ ] Implement registration (Email/Password + Google OAuth)
+- [ ] Implement login with dev mode bypass
+- [ ] Dashboard layout and navigation
+- [ ] API key generation and management UI
+- [ ] Merchant profile settings
+
+### Phase 3: One-Time Payments (Week 5-6)
 - [ ] Merchant API (create orders, query status)
 - [ ] Checkout page with Passkey authentication
 - [ ] Payment execution with Tempo
 - [ ] Onchain event listening & verification
 - [ ] Webhook notifications
 
-### Phase 3: Subscriptions (Week 5-6)
+### Phase 4: Subscriptions (Week 7-8)
 - [ ] Subscription plan API
 - [ ] Access Key authorization UI
 - [ ] Backend Access Key encryption & storage
 - [ ] Subscription scheduler (cron jobs)
 - [ ] Auto-charge execution
 - [ ] User subscription management
-
-### Phase 4: Dashboard & Polish (Week 7-8)
-- [ ] Merchant dashboard (order/subscription views)
-- [ ] Analytics & reporting
-- [ ] Gas sponsorship feature
-- [ ] Error handling & retry logic
-- [ ] Documentation & deployment
 
 ---
 
