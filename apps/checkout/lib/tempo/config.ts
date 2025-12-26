@@ -1,12 +1,22 @@
 import { createConfig, http } from 'wagmi'
-import { tempoTestnet } from './chains'
+import { tempoTestnet } from 'viem/chains'
+import { KeyManager, webAuthn } from 'tempo.ts/wagmi'
 
-// Note: tempo.ts webauthn connector will be added when available
-// For now, use standard wagmi config - passkey integration TBD based on tempo.ts API
+// Fee token is AlphaUSD for testnet
+const FEE_TOKEN = '0x20c0000000000000000000000000000000000001'
+
+export const tempoChain = tempoTestnet.extend({ feeToken: FEE_TOKEN })
+
 export const wagmiConfig = createConfig({
-  chains: [tempoTestnet],
+  chains: [tempoChain],
+  connectors: [
+    webAuthn({
+      keyManager: KeyManager.localStorage(),
+    }),
+  ],
+  multiInjectedProviderDiscovery: false,
   transports: {
-    [tempoTestnet.id]: http(),
+    [tempoChain.id]: http(),
   },
   ssr: true,
 })
