@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useAccount, useConnect, useSendTransaction } from 'wagmi'
+import { useAccount, useConnect, useConnectors, useSendTransaction } from 'wagmi'
 import { encodeFunctionData, parseUnits } from 'viem'
 import { OrderCard } from '@/components/payment/order-card'
 import { PayButton } from '@/components/payment/pay-button'
@@ -36,10 +36,15 @@ export function PaymentClient({ order }: PaymentClientProps) {
   const [txHash, setTxHash] = useState<string>()
   const [error, setError] = useState<string>()
   const [isExpired, setIsExpired] = useState(false)
+  const [showSignUpOption, setShowSignUpOption] = useState(false)
 
   const { isConnected, address } = useAccount()
-  const { connectAsync, connectors } = useConnect()
+  const { connectAsync } = useConnect()
+  const connectors = useConnectors()
   const { sendTransactionAsync } = useSendTransaction()
+
+  // Get the webAuthn connector
+  const webAuthnConnector = connectors[0]
 
   // Check if order is already paid or expired
   if (order.status === 'paid') {
@@ -58,19 +63,44 @@ export function PaymentClient({ order }: PaymentClientProps) {
     )
   }
 
+  // Handle connection with sign-up or sign-in capability
+  const handleConnect = async (isSignUp: boolean) => {
+    try {
+      setError(undefined)
+      setState('connecting')
+
+      if (!webAuthnConnector) {
+        throw new Error('Passkey connector not available')
+      }
+
+      // Connect with sign-up or sign-in capability
+      await connectAsync({
+        connector: webAuthnConnector,
+        ...(isSignUp ? { capabilities: { type: 'sign-up' } } : {}),
+      })
+
+      setShowSignUpOption(false)
+      setState('idle')
+    } catch (err) {
+      console.error('Connection error:', err)
+      // If sign-in fails, offer sign-up option
+      if (!isSignUp && err instanceof Error && err.message.includes('not found')) {
+        setShowSignUpOption(true)
+      }
+      setError(err instanceof Error ? err.message : 'Connection failed')
+      setState('error')
+    }
+  }
+
   const handlePay = async () => {
     try {
       setError(undefined)
 
       // Step 1: Connect wallet if not connected
       if (!isConnected) {
-        setState('connecting')
-        // Use first available connector (will be webauthn in production)
-        const connector = connectors[0]
-        if (!connector) {
-          throw new Error('No wallet connector available')
-        }
-        await connectAsync({ connector })
+        // Try sign-in first (for existing users)
+        await handleConnect(false)
+        return // User needs to click pay again after connecting
       }
 
       // Step 2: Execute payment
@@ -107,7 +137,7 @@ export function PaymentClient({ order }: PaymentClientProps) {
       setState('success')
     } catch (err) {
       console.error('Payment error:', err)
-      setError(err instanceof Error ? err.message : '支付失败，请重试')
+      setError(err instanceof Error ? err.message : 'Payment failed')
       setState('error')
     }
   }
@@ -115,6 +145,7 @@ export function PaymentClient({ order }: PaymentClientProps) {
   const handleRetry = () => {
     setState('idle')
     setError(undefined)
+    setShowSignUpOption(false)
   }
 
   return (
@@ -134,22 +165,60 @@ export function PaymentClient({ order }: PaymentClientProps) {
             redirectUrl={order.metadata?.success_url}
           />
         ) : state === 'error' ? (
-          <PaymentStatus
-            status="error"
-            errorMessage={error}
-            onRetry={handleRetry}
-          />
+          <div className="w-full max-w-sm space-y-4">
+            <PaymentStatus
+              status="error"
+              errorMessage={error}
+              onRetry={handleRetry}
+            />
+            {showSignUpOption && (
+              <div className="text-center space-y-2">
+                <p className="text-sm text-gray-600">No account found?</p>
+                <button
+                  onClick={() => handleConnect(true)}
+                  className="text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  Create new Passkey account
+                </button>
+              </div>
+            )}
+          </div>
         ) : (
           <>
             <OrderCard
               order={order}
               onExpire={() => setIsExpired(true)}
             />
+
+            {/* Show connected address if connected */}
+            {isConnected && address && (
+              <div className="text-sm text-gray-500">
+                Paying from: {address.slice(0, 6)}...{address.slice(-4)}
+              </div>
+            )}
+
             <PayButton
               onClick={handlePay}
               loading={state === 'connecting' || state === 'processing'}
-              error={error}
+              disabled={state === 'connecting' || state === 'processing'}
+              label={
+                !isConnected
+                  ? 'Connect Passkey'
+                  : state === 'processing'
+                  ? 'Processing...'
+                  : 'Pay Now'
+              }
             />
+
+            {/* Sign up option for new users */}
+            {!isConnected && (
+              <button
+                onClick={() => handleConnect(true)}
+                className="text-sm text-gray-500 hover:text-gray-700"
+              >
+                New user? Create Passkey account
+              </button>
+            )}
           </>
         )}
       </main>
