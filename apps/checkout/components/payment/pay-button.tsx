@@ -8,9 +8,16 @@ interface PayButtonProps {
   loading?: boolean
   disabled?: boolean
   error?: string
+  label?: string
 }
 
-export function PayButton({ onClick, loading, disabled, error }: PayButtonProps) {
+export function PayButton({
+  onClick,
+  loading,
+  disabled,
+  error,
+  label = '使用 Passkey 支付'
+}: PayButtonProps) {
   return (
     <div className="w-full max-w-sm space-y-3">
       <Button
@@ -21,7 +28,7 @@ export function PayButton({ onClick, loading, disabled, error }: PayButtonProps)
         className="w-full"
       >
         <Lock className="h-4 w-4 mr-2" />
-        使用 Passkey 支付
+        {label}
       </Button>
 
       {error && (
