@@ -16,8 +16,15 @@ export const THETA_USD = {
   decimals: 6,
 }
 
+// Token type for mapping
+export type Token = {
+  address: `0x${string}`;
+  symbol: string;
+  decimals: number;
+}
+
 // Map currency codes to token addresses
-export const CURRENCY_TO_TOKEN: Record<string, typeof ALPHA_USD> = {
+export const CURRENCY_TO_TOKEN: Record<string, Token> = {
   'USDC': ALPHA_USD,
   'AlphaUSD': ALPHA_USD,
   'USDT': BETA_USD,
