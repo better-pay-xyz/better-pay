@@ -2,12 +2,10 @@
 src = "src"
 out = "out"
 libs = ["lib"]
-solc_version = "0.8.20"
-optimizer = true
-optimizer_runs = 200
+solc = "0.8.20"
 
 [rpc_endpoints]
-tempo-testnet = "${TEMPO_TESTNET_RPC}"
+tempo_testnet = "https://rpc.testnet.tempo.xyz"
 
 [etherscan]
-tempo-testnet = { key = "${ETHERSCAN_API_KEY}" }
+tempo_testnet = { key = "", url = "https://scout.tempo.xyz/api/" }
