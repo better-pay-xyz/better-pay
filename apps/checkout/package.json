@@ -10,6 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@better-pay/database": "workspace:*",
     "@better-pay/shared": "workspace:*",
     "@tanstack/react-query": "^5.17.0",
     "lucide-react": "^0.562.0",

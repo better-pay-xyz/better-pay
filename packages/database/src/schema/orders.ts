@@ -1,6 +1,7 @@
 import { pgTable, text, timestamp, json } from 'drizzle-orm/pg-core'
 import { createId } from '@paralleldrive/cuid2'
 import { merchants } from './merchants'
+import { paymentLinks } from './payment-links'
 
 export const orderStatus = ['pending', 'paid', 'expired', 'cancelled'] as const
 export type OrderStatus = typeof orderStatus[number]
@@ -12,6 +13,8 @@ export const orders = pgTable('orders', {
   merchantId: text('merchant_id')
     .notNull()
     .references(() => merchants.id, { onDelete: 'cascade' }),
+  paymentLinkId: text('payment_link_id')
+    .references(() => paymentLinks.id, { onDelete: 'set null' }),
   amount: text('amount').notNull(),
   currency: text('currency').notNull(),
   memo: text('memo').notNull().unique(),

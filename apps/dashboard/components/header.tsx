@@ -2,6 +2,8 @@
 
 import { LogOut } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { SidebarTrigger } from '@/components/ui/sidebar'
 
 interface HeaderProps {
   merchantName?: string
@@ -21,28 +23,22 @@ export function Header({ merchantName = 'Merchant', merchantEmail = 'merchant@ex
   }
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4">
-      <div className="flex items-center justify-between">
-        {/* Left side - Page title area */}
-        <div>
-          {/* Can be used for breadcrumbs or page title */}
+    <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
+      <SidebarTrigger />
+      <div className="flex flex-1 items-center justify-end gap-4">
+        <div className="text-right">
+          <p className="text-sm font-medium">{merchantName}</p>
+          <p className="text-xs text-muted-foreground">{merchantEmail}</p>
         </div>
 
-        {/* Right side - User info and logout */}
-        <div className="flex items-center gap-4">
-          <div className="text-right">
-            <p className="text-sm font-medium text-gray-900">{merchantName}</p>
-            <p className="text-xs text-gray-500">{merchantEmail}</p>
-          </div>
-
-          <button
-            onClick={handleLogout}
-            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-            title="Logout"
-          >
-            <LogOut className="w-5 h-5" />
-          </button>
-        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleLogout}
+          title="Logout"
+        >
+          <LogOut className="w-5 h-5" />
+        </Button>
       </div>
     </header>
   )

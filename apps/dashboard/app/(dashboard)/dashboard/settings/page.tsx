@@ -2,6 +2,11 @@
 
 import { useState } from 'react'
 import { Save, Check } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
 
 export default function SettingsPage() {
   // Business Information State
@@ -41,150 +46,132 @@ export default function SettingsPage() {
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-500 mt-1">Manage your business information and payment settings.</p>
+        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+        <p className="text-muted-foreground mt-2">
+          Manage your business information and payment settings.
+        </p>
       </div>
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* Business Information Section */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Business Information</h2>
-            <p className="text-sm text-gray-500 mt-1">
-              Basic information about your business
-            </p>
-          </div>
-          <div className="p-6 space-y-4">
-            <div>
-              <label htmlFor="businessName" className="block text-sm font-medium text-gray-700">
-                Business Name
-              </label>
-              <input
+        <Card>
+          <CardHeader>
+            <CardTitle>Business Information</CardTitle>
+            <CardDescription>Basic information about your business</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="businessName">Business Name</Label>
+              <Input
                 id="businessName"
                 type="text"
                 required
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email
-              </label>
-              <input
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
                 id="email"
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Payment Settings Section */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Payment Settings</h2>
-            <p className="text-sm text-gray-500 mt-1">
-              Configure where you receive payments
-            </p>
-          </div>
-          <div className="p-6 space-y-4">
-            <div>
-              <label htmlFor="tempoAddress" className="block text-sm font-medium text-gray-700">
-                Tempo Wallet Address
-              </label>
-              <input
+        <Card>
+          <CardHeader>
+            <CardTitle>Payment Settings</CardTitle>
+            <CardDescription>Configure where you receive payments</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="tempoAddress">Tempo Wallet Address</Label>
+              <Input
                 id="tempoAddress"
                 type="text"
                 required
                 value={tempoAddress}
                 onChange={(e) => setTempoAddress(e.target.value)}
                 placeholder="0x..."
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+                className="font-mono text-sm"
               />
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 This is the Tempo wallet address where you will receive payments. Make sure this
                 address is correct as payments sent to the wrong address cannot be recovered.
               </p>
             </div>
 
-            <div className="flex items-start">
-              <div className="flex items-center h-5">
-                <input
-                  id="sponsorGasFees"
-                  type="checkbox"
-                  checked={sponsorGasFees}
-                  onChange={(e) => setSponsorGasFees(e.target.checked)}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-              </div>
-              <div className="ml-3">
-                <label htmlFor="sponsorGasFees" className="text-sm font-medium text-gray-700">
+            <div className="flex items-start space-x-3">
+              <Checkbox
+                id="sponsorGasFees"
+                checked={sponsorGasFees}
+                onCheckedChange={(checked) => setSponsorGasFees(checked as boolean)}
+              />
+              <div className="space-y-1 leading-none">
+                <Label
+                  htmlFor="sponsorGasFees"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
                   Sponsor gas fees
-                </label>
-                <p className="text-xs text-gray-500 mt-1">
+                </Label>
+                <p className="text-xs text-muted-foreground">
                   When enabled, you cover the gas fees for customer transactions, providing a
                   smoother checkout experience. Gas fees will be deducted from your received
                   payments.
                 </p>
               </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Webhooks Section */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Webhooks</h2>
-            <p className="text-sm text-gray-500 mt-1">
+        <Card>
+          <CardHeader>
+            <CardTitle>Webhooks</CardTitle>
+            <CardDescription>
               Receive real-time notifications about payment events
-            </p>
-          </div>
-          <div className="p-6">
-            <div>
-              <label htmlFor="webhookUrl" className="block text-sm font-medium text-gray-700">
-                Webhook URL
-              </label>
-              <input
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <Label htmlFor="webhookUrl">Webhook URL</Label>
+              <Input
                 id="webhookUrl"
                 type="url"
                 value={webhookUrl}
                 onChange={(e) => setWebhookUrl(e.target.value)}
                 placeholder="https://yourdomain.com/webhooks/betterpay"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 We will send POST requests to this URL when payment events occur (e.g., payment
                 completed, payment failed). Leave empty to disable webhooks.
               </p>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Save Button */}
         <div className="flex justify-end">
-          <button
-            type="submit"
-            className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={isSaved}
-          >
+          <Button type="submit" disabled={isSaved} className="min-w-[140px]">
             {isSaved ? (
               <>
-                <Check className="w-5 h-5" />
+                <Check className="w-4 h-4 mr-2" />
                 Saved!
               </>
             ) : (
               <>
-                <Save className="w-5 h-5" />
+                <Save className="w-4 h-4 mr-2" />
                 Save Settings
               </>
             )}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

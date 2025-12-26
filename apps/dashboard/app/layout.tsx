@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { TRPCProvider } from '@/components/providers/trpc-provider'
 
 export const metadata: Metadata = {
   title: 'Dashboard - BetterPay',
@@ -13,8 +14,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="antialiased bg-gray-50">
-        {children}
+      <body className="antialiased bg-background">
+        <TRPCProvider>{children}</TRPCProvider>
       </body>
     </html>
   )
