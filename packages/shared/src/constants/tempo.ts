@@ -7,4 +7,4 @@ export const TEMPO_MAINNET_RPC = 'https://rpc.tempo.xyz' // Placeholder
 export const USDC_ADDRESS_TESTNET = '0x...' // Placeholder
 export const USDT_ADDRESS_TESTNET = '0x...' // Placeholder
 
-export const PAYMENT_REGISTRY_ADDRESS_TESTNET = '0x...' // Will be updated after deployment
+export const PAYMENT_REGISTRY_ADDRESS_TESTNET = '0x8719442721893D17c508Cd05Ae550CaC8897c507'
