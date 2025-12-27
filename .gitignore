@@ -36,3 +36,4 @@ drizzle/
 # Logs
 *.log
 npm-debug.log*
+*.tsbuildinfo
