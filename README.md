@@ -1,119 +1,132 @@
 # BetterPay
 
-现代化的加密货币支付网关，基于 Tempo 区块链和 Passkey 认证。
+A modern cryptocurrency payment gateway built on Tempo blockchain with Passkey authentication.
 
-## 特性
+## Features
 
-- 🔐 **Passkey 认证** - 使用 WebAuthn 实现无密码的生物识别登录
-- ⚡ **Tempo 区块链** - 基于 Tempo 测试网的快速支付
-- 💳 **商家仪表板** - 完整的订单管理、API Keys 和设置面板
-- 🔗 **智能合约** - 链上支付记录和订阅管理
-- 🎨 **现代化 UI** - 使用 Next.js 14 和 Tailwind CSS
+- **Passkey Authentication** - Passwordless biometric login using WebAuthn
+- **Tempo Blockchain** - Fast payments on Tempo testnet
+- **Merchant Dashboard** - Complete order management, API keys, webhooks, and analytics
+- **Payment Links** - Create shareable payment links for products
+- **Smart Contracts** - On-chain payment records and verification
+- **Modern UI** - Built with Next.js 15, Tailwind CSS, and shadcn/ui
 
-## 技术栈
+## Tech Stack
 
-- **前端框架**: Next.js 14 (App Router)
-- **区块链**: Tempo 测试网 + tempo.ts SDK
-- **认证**: WebAuthn / Passkeys
+- **Frontend**: Next.js 15 (App Router)
+- **Blockchain**: Tempo Testnet + tempo.ts SDK
+- **Authentication**: WebAuthn / Passkeys
 - **Web3**: wagmi 2.x + viem
-- **智能合约**: Solidity + Foundry
-- **数据库**: PostgreSQL + Prisma
-- **包管理**: Bun
+- **Smart Contracts**: Solidity + Foundry
+- **Database**: PostgreSQL + Drizzle ORM
+- **API**: tRPC (Dashboard) + Hono (External API)
+- **Package Manager**: Bun
 - **Monorepo**: Bun workspaces
 
-## 项目结构
+## Project Structure
 
 ```
 better-pay/
 ├── apps/
-│   ├── checkout/          # 支付页面应用
-│   └── dashboard/         # 商家仪表板应用
+│   ├── api/               # External merchant API (Hono)
+│   ├── checkout/          # Payment page app (Next.js)
+│   └── dashboard/         # Merchant dashboard app (Next.js)
 ├── packages/
-│   ├── contracts/         # 智能合约 (Foundry)
-│   ├── database/          # 数据库 schema (Prisma)
-│   └── shared/            # 共享代码和 ABI
-└── docs/                  # 文档和设计方案
+│   ├── contracts/         # Smart contracts (Foundry)
+│   ├── database/          # Database schema (Drizzle)
+│   └── shared/            # Shared utilities and ABIs
 ```
 
-## 快速开始
+## Quick Start
 
-### 前置要求
+### Prerequisites
 
 - [Bun](https://bun.sh) >= 1.0.0
-- [Foundry](https://getfoundry.sh) (用于合约开发)
-- PostgreSQL 数据库
+- [Foundry](https://getfoundry.sh) (for contract development)
+- PostgreSQL database
 
-### 安装
+### Installation
 
 ```bash
-# 安装依赖
+# Install dependencies
 bun install
 
-# 配置环境变量
-cp .env.example .env
-# 编辑 .env 填入数据库连接等信息
+# Configure environment variables
+cp apps/dashboard/.env.example apps/dashboard/.env.local
+cp apps/checkout/.env.example apps/checkout/.env.local
+# Edit .env.local files with your database connection and other settings
 
-# 运行数据库迁移
-bun run db:migrate
+# Push database schema
+cd packages/database
+DATABASE_URL='your-database-url' bunx drizzle-kit push:pg
 ```
 
-### 开发
+### Development
 
 ```bash
-# 启动所有应用
+# Start all apps
 bun run dev
 
-# 或分别启动
-cd apps/checkout && bun run dev    # http://localhost:3000
+# Or start individually
 cd apps/dashboard && bun run dev   # http://localhost:3001
+cd apps/checkout && bun run dev    # http://localhost:3002
+cd apps/api && bun run dev         # http://localhost:3003
 ```
 
-### 构建
+### Build
 
 ```bash
 bun run build
 ```
 
-## 智能合约
+## Smart Contracts
 
-PaymentRegistry 合约已部署到 Tempo 测试网：
+PaymentRegistry contract deployed to Tempo testnet:
 
-- **合约地址**: `0x8719442721893D17c508Cd05Ae550CaC8897c507`
-- **浏览器**: https://scout.tempo.xyz/address/0x8719442721893D17c508Cd05Ae550CaC8897c507
-- **网络**: Tempo Testnet (Chain ID: 42429)
+- **Contract Address**: `0x8719442721893D17c508Cd05Ae550CaC8897c507`
+- **Explorer**: https://scout.tempo.xyz/address/0x8719442721893D17c508Cd05Ae550CaC8897c507
+- **Network**: Tempo Testnet (Chain ID: 42429)
 
-### 合约开发
+### Contract Development
 
 ```bash
 cd packages/contracts
 
-# 编译合约
+# Build contracts
 forge build
 
-# 运行测试
+# Run tests
 forge test
 
-# 部署到测试网
+# Deploy to testnet
 forge script script/Deploy.s.sol --rpc-url tempo_testnet --broadcast
 ```
 
-## 支付流程
+## Payment Flow
 
-1. 商家创建订单（通过 API）
-2. 用户访问支付页面 (`/pay/[memo]`)
-3. 用户使用 Passkey 登录（自动创建 Tempo 钱包）
-4. 用户确认支付（转账 ERC20 代币）
-5. 后端确认交易并更新订单状态
-6. 可选：重定向到商家指定的成功页面
+### Via API
+1. Merchant creates an order via API
+2. User visits payment page (`/pay/[memo]`)
+3. User authenticates with Passkey (auto-creates Tempo wallet)
+4. User confirms payment (ERC20 token transfer)
+5. Backend verifies transaction and updates order status
+6. Optional: Redirect to merchant's success URL
 
-## API 使用
+### Via Payment Links
+1. Merchant creates a Payment Link in Dashboard
+2. Merchant shares the link with customers
+3. Customer visits the product page
+4. Customer clicks "Pay Now" to initiate payment
+5. Payment flow continues as above
 
-### 创建订单
+## API Usage
+
+### Create Order
 
 ```bash
-POST /api/orders
+POST http://localhost:3003/api/v1/orders
 Content-Type: application/json
-Authorization: Bearer YOUR_API_KEY
+X-API-Key: YOUR_API_KEY
 
 {
   "amount": "10.00",
@@ -124,56 +137,56 @@ Authorization: Bearer YOUR_API_KEY
 }
 ```
 
-### 获取订单状态
+### Get Order Status
 
 ```bash
-GET /api/orders/[orderId]
-Authorization: Bearer YOUR_API_KEY
+GET http://localhost:3003/api/v1/orders/[orderId]
+X-API-Key: YOUR_API_KEY
 ```
 
-## Passkey 认证
+## Dashboard Features
 
-BetterPay 使用 WebAuthn 标准实现 Passkey 认证：
+- **Overview**: Real-time stats and recent orders
+- **Orders**: Full order list with status tracking
+- **Payment Links**: Create and manage shareable payment links
+- **API Keys**: Generate and manage API keys
+- **Webhooks**: Configure webhook endpoints for payment events
+- **Analytics**: Revenue trends and transaction metrics
+- **Settings**: Business info and payment configuration
 
-- 支持 Face ID / Touch ID (iOS/macOS)
-- 支持 Windows Hello (Windows)
-- 支持硬件安全钥匙 (YubiKey 等)
-- 无需记忆密码，更安全
+## Passkey Authentication
 
-## 开发工具
+BetterPay uses WebAuthn standard for Passkey authentication:
 
-```bash
-# 数据库管理
-bun run db:studio        # 打开 Prisma Studio
+- Face ID / Touch ID (iOS/macOS)
+- Windows Hello (Windows)
+- Hardware security keys (YubiKey, etc.)
+- No passwords to remember, more secure
 
-# 生成 Prisma client
-bun run db:generate
+## Environment Variables
 
-# 运行测试
-bun test
-```
-
-## 环境变量
-
-参考 `.env.example` 文件配置以下变量：
+### Dashboard (`apps/dashboard/.env.local`)
 
 ```env
-# 数据库
 DATABASE_URL="postgresql://..."
-
-# 认证
-NEXTAUTH_SECRET="your-secret"
-NEXTAUTH_URL="http://localhost:3000"
-
-# Tempo 区块链
-NEXT_PUBLIC_TEMPO_RPC_URL="https://rpc.testnet.tempo.xyz"
-NEXT_PUBLIC_PAYMENT_REGISTRY_ADDRESS="0x8719442721893D17c508Cd05Ae550CaC8897c507"
+ENCRYPTION_KEY="your-32-char-key"
+BETTER_AUTH_SECRET="your-secret"
+NEXT_PUBLIC_API_URL="http://localhost:3003"
 ```
 
-## 贡献
+### Checkout (`apps/checkout/.env.local`)
 
-欢迎提交 Issue 和 Pull Request！
+```env
+DATABASE_URL="postgresql://..."
+NEXT_PUBLIC_TEMPO_RPC_URL="https://rpc.testnet.tempo.xyz"
+NEXT_PUBLIC_PAYMENT_REGISTRY_ADDRESS="0x8719442721893D17c508Cd05Ae550CaC8897c507"
+NEXT_PUBLIC_USDC_ADDRESS="0x20c0000000000000000000000000000000000001"
+```
 
-## 许可证
+## Contributing
+
+Issues and Pull Requests are welcome!
+
+## License
 
 MIT
