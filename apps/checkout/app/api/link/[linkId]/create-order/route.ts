@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { db, paymentLinks, orders } from '@better-pay/database'
+import { db, paymentLinks, orders, merchants } from '@better-pay/database'
 import { eq, and, sql } from 'drizzle-orm'
 import { generateMemo } from '@better-pay/shared/utils'
 
@@ -7,19 +7,38 @@ interface RouteParams {
   params: Promise<{ linkId: string }>
 }
 
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
+
 export async function POST(request: Request, { params }: RouteParams) {
   try {
     const { linkId } = await params
 
-    // Get the payment link
+    // Get the payment link with merchant info
     const [link] = await db
-      .select()
+      .select({
+        id: paymentLinks.id,
+        merchantId: paymentLinks.merchantId,
+        title: paymentLinks.title,
+        amount: paymentLinks.amount,
+        currency: paymentLinks.currency,
+        isActive: paymentLinks.isActive,
+        tempoAddress: merchants.tempoAddress
+      })
       .from(paymentLinks)
+      .innerJoin(merchants, eq(paymentLinks.merchantId, merchants.id))
       .where(and(eq(paymentLinks.id, linkId), eq(paymentLinks.isActive, true)))
       .limit(1)
 
     if (!link) {
       return NextResponse.json({ error: 'Payment link not found or inactive' }, { status: 404 })
+    }
+
+    // Validate merchant has configured a valid wallet address
+    if (!link.tempoAddress || link.tempoAddress === ZERO_ADDRESS) {
+      return NextResponse.json(
+        { error: 'Merchant has not configured a payment wallet. Please contact the merchant.' },
+        { status: 400 }
+      )
     }
 
     // Generate unique memo for this order

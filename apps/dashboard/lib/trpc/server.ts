@@ -51,13 +51,14 @@ export async function createContext(): Promise<Context> {
 
     if (!testMerchant) {
       // Create test merchant if it doesn't exist
+      // Note: tempoAddress is left null - set it in Settings before testing payments
       const [created] = await db
         .insert(merchants)
         .values({
           name: 'Test Merchant',
           email: 'test@betterpay.dev',
-          apiKeyHash: 'dev_test_key_hash_placeholder',
-          tempoAddress: '0x0000000000000000000000000000000000000000'
+          apiKeyHash: 'dev_test_key_hash_placeholder'
+          // tempoAddress: null - must be configured in Settings before accepting payments
         })
         .returning({
           id: merchants.id,
