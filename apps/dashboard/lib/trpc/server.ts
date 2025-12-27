@@ -16,7 +16,61 @@ export interface Context {
 
 // Create context for each request
 export async function createContext(): Promise<Context> {
-  // TODO: Replace with real auth logic (e.g., better-auth session)
+  // Development mode: use a mock merchant for testing
+  if (process.env.NODE_ENV === 'development') {
+    // Check if we have a real merchantId cookie first
+    const cookieStore = await cookies()
+    const merchantId = cookieStore.get('merchantId')?.value
+
+    if (merchantId) {
+      const [merchant] = await db
+        .select({
+          id: merchants.id,
+          name: merchants.name,
+          email: merchants.email
+        })
+        .from(merchants)
+        .where(eq(merchants.id, merchantId))
+        .limit(1)
+
+      if (merchant) {
+        return { merchant }
+      }
+    }
+
+    // Dev fallback: get or create a test merchant
+    let [testMerchant] = await db
+      .select({
+        id: merchants.id,
+        name: merchants.name,
+        email: merchants.email
+      })
+      .from(merchants)
+      .where(eq(merchants.email, 'test@betterpay.dev'))
+      .limit(1)
+
+    if (!testMerchant) {
+      // Create test merchant if it doesn't exist
+      const [created] = await db
+        .insert(merchants)
+        .values({
+          name: 'Test Merchant',
+          email: 'test@betterpay.dev',
+          apiKeyHash: 'dev_test_key_hash_placeholder',
+          tempoAddress: '0x0000000000000000000000000000000000000000'
+        })
+        .returning({
+          id: merchants.id,
+          name: merchants.name,
+          email: merchants.email
+        })
+      testMerchant = created
+    }
+
+    return { merchant: testMerchant }
+  }
+
+  // Production: require real auth
   const cookieStore = await cookies()
   const merchantId = cookieStore.get('merchantId')?.value
 
