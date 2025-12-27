@@ -16,7 +16,7 @@ export function PayButton({
   loading,
   disabled,
   error,
-  label = '使用 Passkey 支付'
+  label = 'Pay with Passkey'
 }: PayButtonProps) {
   return (
     <div className="w-full max-w-sm space-y-3">

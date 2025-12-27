@@ -19,7 +19,7 @@ export function CountdownTimer({ expiresAt, onExpire }: CountdownTimerProps) {
 
       if (diff <= 0) {
         setIsExpired(true)
-        setTimeLeft('已过期')
+        setTimeLeft('Expired')
         onExpire?.()
         return
       }
@@ -38,7 +38,7 @@ export function CountdownTimer({ expiresAt, onExpire }: CountdownTimerProps) {
 
   return (
     <span className={isExpired ? 'text-red-600' : 'text-gray-500'}>
-      {isExpired ? '已过期' : `${timeLeft} 后过期`}
+      {isExpired ? 'Expired' : `Expires in ${timeLeft}`}
     </span>
   )
 }

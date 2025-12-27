@@ -20,15 +20,15 @@ export function FaucetLink() {
         {isPending ? (
           <>
             <Loader2 className="h-3 w-3 animate-spin" />
-            <span>领取中...</span>
+            <span>Claiming...</span>
           </>
         ) : isSuccess ? (
           <>
             <Check className="h-3 w-3" />
-            <span>已领取</span>
+            <span>Claimed</span>
           </>
         ) : (
-          <span>领取测试币</span>
+          <span>Get Test Tokens</span>
         )}
       </button>
     )
@@ -43,7 +43,7 @@ export function FaucetLink() {
       className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
     >
       <span>🚰</span>
-      <span>领取测试币</span>
+      <span>Get Test Tokens</span>
       <ExternalLink className="h-3 w-3" />
     </a>
   )

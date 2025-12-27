@@ -38,7 +38,7 @@ export function OrderCard({ order, onExpire }: OrderCardProps) {
 
         <div className="pt-2 border-t border-gray-100 space-y-1 text-sm">
           <div className="text-gray-500">
-            订单 #{order.id.slice(-8).toUpperCase()}
+            Order #{order.id.slice(-8).toUpperCase()}
           </div>
           <CountdownTimer expiresAt={expiresAt} onExpire={onExpire} />
         </div>

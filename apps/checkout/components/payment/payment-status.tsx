@@ -42,28 +42,28 @@ export function PaymentStatus({
     success: {
       icon: CheckCircle,
       iconClass: 'text-green-500',
-      title: '支付成功!',
+      title: 'Payment Successful!',
       description: redirectUrl
-        ? `${countdown} 秒后返回商户...`
-        : '感谢您的付款',
+        ? `Redirecting to merchant in ${countdown}s...`
+        : 'Thank you for your payment',
     },
     error: {
       icon: XCircle,
       iconClass: 'text-red-500',
-      title: '支付失败',
-      description: errorMessage || '请重试',
+      title: 'Payment Failed',
+      description: errorMessage || 'Please try again',
     },
     expired: {
       icon: Clock,
       iconClass: 'text-orange-500',
-      title: '订单已过期',
-      description: '请联系商户获取新的支付链接',
+      title: 'Order Expired',
+      description: 'Please contact the merchant for a new payment link',
     },
     already_paid: {
       icon: AlertCircle,
       iconClass: 'text-blue-500',
-      title: '订单已支付',
-      description: '此订单已经完成支付',
+      title: 'Order Already Paid',
+      description: 'This order has already been paid',
     },
   }
 
@@ -83,13 +83,13 @@ export function PaymentStatus({
           rel="noopener noreferrer"
           className="inline-block text-sm text-blue-600 hover:underline"
         >
-          查看交易 ↗
+          View Transaction ↗
         </a>
       )}
 
       {status === 'error' && onRetry && (
         <Button onClick={onRetry} variant="secondary">
-          重试
+          Retry
         </Button>
       )}
     </div>
