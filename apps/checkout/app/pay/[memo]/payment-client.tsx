@@ -8,7 +8,9 @@ import { PayButton } from '@/components/payment/pay-button'
 import { PaymentStatus } from '@/components/payment/payment-status'
 import { FaucetLink } from '@/components/payment/faucet-link'
 import { CURRENCY_TO_TOKEN, erc20Abi, ALPHA_USD } from '@/lib/tempo/tokens'
-
+import { User, PlusCircle } from 'lucide-react'
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 type PaymentState = 'idle' | 'connecting' | 'processing' | 'success' | 'error'
 
 interface Order {
@@ -49,7 +51,7 @@ export function PaymentClient({ order }: PaymentClientProps) {
   // Check if order is already paid or expired
   if (order.status === 'paid') {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50/50">
         <PaymentStatus status="already_paid" />
       </div>
     )
@@ -57,7 +59,7 @@ export function PaymentClient({ order }: PaymentClientProps) {
 
   if (isExpired || new Date(order.expiresAt) < new Date()) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50/50">
         <PaymentStatus status="expired" />
       </div>
     )
@@ -149,15 +151,26 @@ export function PaymentClient({ order }: PaymentClientProps) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-slate-50 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+      </div>
+
       {/* Header */}
-      <header className="flex justify-between items-center p-4">
+      <header className="flex justify-between items-center p-6 relative z-10 max-w-5xl mx-auto w-full">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-xl">B</span>
+          </div>
+          <span className="text-xl font-bold tracking-tight text-slate-900">BetterPay</span>
+        </div>
         <FaucetLink />
-        <span className="text-lg font-semibold text-gray-900">BetterPay</span>
       </header>
 
       {/* Main content */}
-      <main className="flex-1 flex flex-col items-center justify-center p-4 space-y-6">
+      <main className="flex-1 flex flex-col items-center justify-center p-4 space-y-8 relative z-10 max-w-sm mx-auto w-full animate-fade-in">
         {state === 'success' ? (
           <PaymentStatus
             status="success"
@@ -165,22 +178,26 @@ export function PaymentClient({ order }: PaymentClientProps) {
             redirectUrl={order.metadata?.success_url}
           />
         ) : state === 'error' ? (
-          <div className="w-full max-w-sm space-y-4">
+          <div className="w-full space-y-4">
             <PaymentStatus
               status="error"
               errorMessage={error}
               onRetry={handleRetry}
             />
             {showSignUpOption && (
-              <div className="text-center space-y-2">
-                <p className="text-sm text-gray-600">No account found?</p>
-                <button
+              <Card className="p-8 text-center space-y-4">
+                <div className="space-y-1">
+                  <h3 className="font-bold text-slate-900">No account found</h3>
+                  <p className="text-sm text-slate-500 font-medium leading-relaxed">It looks like you don&apos;t have a passkey account yet.</p>
+                </div>
+                <Button
                   onClick={() => handleConnect(true)}
-                  className="text-blue-600 hover:text-blue-800 font-medium"
+                  className="w-full"
                 >
-                  Create new Passkey account
-                </button>
-              </div>
+                  <PlusCircle className="w-4 h-4 mr-2" />
+                  Create Passkey Account
+                </Button>
+              </Card>
             )}
           </div>
         ) : (
@@ -190,42 +207,54 @@ export function PaymentClient({ order }: PaymentClientProps) {
               onExpire={() => setIsExpired(true)}
             />
 
-            {/* Show connected address if connected */}
-            {isConnected && address && (
-              <div className="text-sm text-gray-500">
-                Paying from: {address.slice(0, 6)}...{address.slice(-4)}
-              </div>
-            )}
+            <div className="w-full space-y-4">
+              {/* Show connected address if connected */}
+              {isConnected && address ? (
+                <div className="flex items-center justify-center gap-2 py-2.5 px-4 bg-white/50 backdrop-blur-sm rounded-full border border-slate-100 shadow-sm mx-auto w-fit">
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                  <User className="w-3.5 h-3.5 text-slate-400" />
+                  <span className="text-xs font-bold font-mono text-slate-600 tracking-tight">
+                    {address.slice(0, 6)}...{address.slice(-4)}
+                  </span>
+                </div>
+              ) : (
+                <div className="text-center">
+                  <button
+                    onClick={() => handleConnect(true)}
+                    className="text-[10px] font-black uppercase tracking-widest text-primary hover:text-primary/80 transition-colors inline-flex items-center gap-1.5"
+                  >
+                    <PlusCircle className="w-3.5 h-3.5" />
+                    New user? Create a Passkey
+                  </button>
+                </div>
+              )}
 
-            <PayButton
-              onClick={handlePay}
-              loading={state === 'connecting' || state === 'processing'}
-              disabled={state === 'connecting' || state === 'processing'}
-              label={
-                !isConnected
-                  ? 'Connect Passkey'
-                  : state === 'processing'
-                  ? 'Processing...'
-                  : 'Pay Now'
-              }
-            />
-
-            {/* Sign up option for new users */}
-            {!isConnected && (
-              <button
-                onClick={() => handleConnect(true)}
-                className="text-sm text-gray-500 hover:text-gray-700"
-              >
-                New user? Create Passkey account
-              </button>
-            )}
+              <PayButton
+                onClick={handlePay}
+                loading={state === 'connecting' || state === 'processing'}
+                disabled={state === 'connecting' || state === 'processing'}
+                label={
+                  !isConnected
+                    ? 'Connect Passkey'
+                    : state === 'processing'
+                    ? 'Processing...'
+                    : 'Pay Now'
+                }
+              />
+            </div>
           </>
         )}
       </main>
 
       {/* Footer */}
-      <footer className="p-4 text-center text-xs text-gray-400">
-        Secure payments powered by Tempo
+      <footer className="p-8 text-center relative z-10">
+        <div className="flex items-center justify-center gap-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+          <span>Secure</span>
+          <div className="w-1 h-1 rounded-full bg-slate-200" />
+          <span>Decentralized</span>
+          <div className="w-1 h-1 rounded-full bg-slate-200" />
+          <span>Instant</span>
+        </div>
       </footer>
     </div>
   )

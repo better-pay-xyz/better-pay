@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, AlertTriangle, Copy, Check, Key } from 'lucide-react'
+import { Plus, AlertTriangle, Copy, Check, Key, ShieldCheck, Loader2 } from 'lucide-react'
 import { ApiKeyCard } from '@/components/api-key-card'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -17,6 +17,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { trpc } from '@/lib/trpc/client'
+import { Card } from '@/components/ui/card'
 
 export default function ApiKeysPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -68,86 +69,88 @@ export default function ApiKeysPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-fade-in">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">API Keys</h1>
-          <p className="text-muted-foreground mt-1">
-            Manage your API keys for payment integration
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-3xl font-black tracking-tight text-slate-900">API Keys</h1>
+          <p className="text-slate-500 font-medium">
+            Manage your API keys for custom payment integration.
           </p>
         </div>
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="w-4 h-4 mr-2" />
-              Create Key
+              Create New Key
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden">
             {!generatedKey ? (
               <>
-                <DialogHeader>
+                <DialogHeader className="p-8 bg-slate-50/50 border-b border-slate-100 text-center">
                   <DialogTitle>Create New API Key</DialogTitle>
                   <DialogDescription>
-                    Create a new API key for your integration.
+                    Create a secure key for your server-side integration.
                   </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleCreateKey} className="space-y-4">
+                <form onSubmit={handleCreateKey} className="p-8 space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="keyName">Key Name</Label>
+                    <Label htmlFor="keyName" className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Key Name *</Label>
                     <Input
                       id="keyName"
                       required
                       value={newKeyName}
                       onChange={(e) => setNewKeyName(e.target.value)}
-                      placeholder="e.g., Production API Key"
+                      placeholder="e.g., Production Server Key"
                     />
                   </div>
 
-                  <DialogFooter>
+                  <DialogFooter className="pt-2">
                     <Button type="submit" className="w-full" disabled={createMutation.isPending}>
-                      {createMutation.isPending ? 'Creating...' : 'Create API Key'}
+                      {createMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <ShieldCheck className="w-4 h-4 mr-2" />}
+                      {createMutation.isPending ? 'Creating...' : 'Generate Secret Key'}
                     </Button>
                   </DialogFooter>
                 </form>
               </>
             ) : (
               <>
-                <DialogHeader>
-                  <DialogTitle>API Key Created</DialogTitle>
-                  <DialogDescription>
-                    Save this key securely. You won't be able to see it again.
+                <DialogHeader className="p-8 bg-emerald-50 border-b border-emerald-100 text-center">
+                  <DialogTitle className="text-emerald-900">Key Generated!</DialogTitle>
+                  <DialogDescription className="text-emerald-700">
+                    This is the only time you can see this key.
                   </DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4">
-                  <Alert variant="default" className="border-yellow-200 bg-yellow-50">
-                    <AlertTriangle className="h-4 w-4 text-yellow-600" />
-                    <AlertTitle className="text-yellow-800">Save this key now</AlertTitle>
-                    <AlertDescription className="text-yellow-700">
-                      This is the only time you will be able to see this key. Copy it and store
-                      it securely.
+                <div className="p-8 space-y-6">
+                  <Alert variant="default" className="border-amber-100 bg-amber-50 rounded-2xl">
+                    <AlertTriangle className="h-4 w-4 text-amber-600" />
+                    <AlertTitle className="text-amber-900 font-bold text-xs uppercase tracking-widest">Security Warning</AlertTitle>
+                    <AlertDescription className="text-amber-700 text-xs font-medium">
+                      Store this key securely. We cannot recover it if lost.
                     </AlertDescription>
                   </Alert>
 
                   <div className="space-y-2">
-                    <Label>Your new API key</Label>
-                    <code className="block px-3 py-2 bg-muted rounded-md text-sm font-mono break-all">
-                      {generatedKey}
-                    </code>
+                    <Label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Secret API Key</Label>
+                    <div className="relative group">
+                      <code className="block w-full px-4 py-4 bg-slate-900 text-emerald-400 rounded-2xl text-sm font-mono break-all font-bold shadow-inner">
+                        {generatedKey}
+                      </code>
+                    </div>
                   </div>
 
                   <DialogFooter>
-                    <Button onClick={handleCopyAndClose} className="w-full">
+                    <Button onClick={handleCopyAndClose} variant="premium" className="w-full">
                       {copied ? (
                         <>
                           <Check className="w-4 h-4 mr-2" />
-                          Copied!
+                          Copied to Clipboard
                         </>
                       ) : (
                         <>
                           <Copy className="w-4 h-4 mr-2" />
-                          Copy & Close
+                          Copy & Finish
                         </>
                       )}
                     </Button>
@@ -159,41 +162,66 @@ export default function ApiKeysPage() {
         </Dialog>
       </div>
 
-      {/* Security Warning Banner */}
-      <Alert>
-        <AlertTriangle className="h-4 w-4" />
-        <AlertTitle>Keep your API keys secure</AlertTitle>
-        <AlertDescription>
-          Never share your API keys publicly or commit them to version control. Use environment
-          variables to store them securely.
-        </AlertDescription>
-      </Alert>
-
-      {/* API Keys List */}
-      {isLoading ? (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">Loading API keys...</p>
-        </div>
-      ) : !apiKeys || apiKeys.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <Key className="w-12 h-12 text-muted-foreground/50 mb-4" />
-          <h3 className="text-lg font-medium">No API keys yet</h3>
-          <p className="text-sm text-muted-foreground mt-1">
-            Create an API key to start integrating with BetterPay
-          </p>
-        </div>
-      ) : (
+      <div className="grid grid-cols-1 gap-8">
+        {/* API Keys List */}
         <div className="space-y-4">
-          {apiKeys.map((apiKey) => (
-            <ApiKeyCard
-              key={apiKey.id}
-              apiKey={apiKey}
-              onDelete={handleDelete}
-              isDeleting={deleteMutation.isPending}
-            />
-          ))}
+          <div className="flex items-center gap-2 mb-2 ml-1">
+            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Your Integration Keys</h2>
+            <div className="h-px flex-1 bg-slate-100" />
+          </div>
+
+          {isLoading ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {[1, 2].map((i) => (
+                <div key={i} className="h-32 bg-slate-50 animate-pulse rounded-[2rem]" />
+              ))}
+            </div>
+          ) : !apiKeys || apiKeys.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-24 text-center bg-white/50 backdrop-blur-sm rounded-[2.5rem] border-2 border-dashed border-slate-100">
+              <div className="p-6 bg-white rounded-full w-fit mx-auto shadow-sm mb-4 text-slate-200">
+                <Key className="w-10 h-10" />
+              </div>
+              <h3 className="text-xl font-black text-slate-900">No API keys yet</h3>
+              <p className="text-sm text-slate-500 font-medium mt-1 max-w-[250px]">
+                Create an API key to start building your custom integration.
+              </p>
+              <Button onClick={() => setIsModalOpen(true)} className="mt-6">
+                Generate First Key
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {apiKeys.map((apiKey) => (
+                <ApiKeyCard
+                  key={apiKey.id}
+                  apiKey={apiKey}
+                  onDelete={handleDelete}
+                  isDeleting={deleteMutation.isPending}
+                />
+              ))}
+            </div>
+          )}
         </div>
-      )}
+
+        {/* Security Banner */}
+        <Card variant="premium" className="bg-slate-900 p-10 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full -mr-32 -mt-32 blur-3xl transition-all group-hover:bg-primary/20" />
+          <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
+            <div className="p-5 bg-white/10 rounded-2xl border border-white/10 backdrop-blur-sm">
+              <ShieldCheck className="w-8 h-8 text-primary" />
+            </div>
+            <div className="flex-1 text-center md:text-left space-y-1">
+              <h3 className="text-xl font-black text-white">Security Best Practices</h3>
+              <p className="text-slate-400 font-medium text-sm max-w-md leading-relaxed">
+                Never share secret keys or commit them to version control. Use environment variables to keep your integration safe.
+              </p>
+            </div>
+            <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 font-bold h-12 px-8 rounded-xl">
+              Security Guide
+            </Button>
+          </div>
+        </Card>
+      </div>
     </div>
   )
 }

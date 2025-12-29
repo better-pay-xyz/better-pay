@@ -10,12 +10,12 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
+      <SidebarInset className="bg-slate-50/50">
         <Header
           merchantName="Demo Merchant"
           merchantEmail="demo@example.com"
         />
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 lg:p-10 max-w-7xl mx-auto w-full">
           {children}
         </main>
       </SidebarInset>

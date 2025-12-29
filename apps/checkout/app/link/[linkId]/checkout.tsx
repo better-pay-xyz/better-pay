@@ -3,6 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { PaymentLink } from '@better-pay/database'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { ShieldCheck, Loader2, ArrowRight, ShoppingBag } from 'lucide-react'
 
 interface Props {
   link: PaymentLink
@@ -39,102 +42,74 @@ export function PaymentLinkCheckout({ link }: Props) {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden">
+    <Card className="border-none shadow-2xl bg-white/80 backdrop-blur-xl overflow-hidden rounded-[2rem]">
       {/* Product Image */}
-      {link.imageUrl && (
-        <div className="aspect-video bg-gray-100">
+      {link.imageUrl ? (
+        <div className="aspect-video bg-slate-100 relative group overflow-hidden">
           <img
             src={link.imageUrl}
             alt={link.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+        </div>
+      ) : (
+        <div className="aspect-video bg-slate-50 flex items-center justify-center">
+          <ShoppingBag className="w-12 h-12 text-slate-200" />
         </div>
       )}
 
       {/* Product Info */}
-      <div className="p-6 space-y-4">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">{link.title}</h1>
+      <CardContent className="p-8 space-y-8">
+        <div className="text-center space-y-2">
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-tight">{link.title}</h1>
           {link.description && (
-            <p className="mt-2 text-gray-600">{link.description}</p>
+            <p className="text-sm text-slate-500 font-medium leading-relaxed">{link.description}</p>
           )}
         </div>
 
-        {/* Price */}
-        <div className="text-center py-4">
-          <div className="inline-flex items-baseline gap-1">
-            <span className="text-4xl font-bold text-gray-900">
+        {/* Price Display */}
+        <div className="p-6 bg-slate-50/50 rounded-2xl border border-slate-100 text-center space-y-1">
+          <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Total Amount</div>
+          <div className="flex items-baseline justify-center gap-1.5">
+            <span className="text-4xl font-black text-slate-900 tracking-tighter">
               ${link.amount}
             </span>
-            <span className="text-lg text-gray-500">{link.currency}</span>
+            <span className="text-lg font-bold text-slate-400 uppercase">{link.currency}</span>
           </div>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg text-center">
+          <div className="p-4 bg-rose-50 border border-rose-100 rounded-xl text-rose-600 text-xs font-bold text-center animate-shake">
             {error}
           </div>
         )}
 
         {/* Pay Button */}
-        <button
+        <Button
           onClick={handlePayNow}
           disabled={isLoading}
-          className="w-full bg-[#3ECF8E] hover:bg-[#38b87f] text-white font-semibold py-4 px-6 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          size="lg"
+          className="w-full h-14 rounded-xl text-lg font-bold shadow-lg shadow-primary/20 transition-all active:scale-[0.98] gap-2"
         >
           {isLoading ? (
-            <>
-              <svg
-                className="animate-spin h-5 w-5"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-              </svg>
-              Processing...
-            </>
+            <Loader2 className="h-5 w-5 animate-spin" />
           ) : (
-            <>
-              Pay Now
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 7l5 5m0 0l-5 5m5-5H6"
-                />
-              </svg>
-            </>
+            <ShieldCheck className="h-5 w-5" />
           )}
-        </button>
+          {isLoading ? 'Processing...' : 'Proceed to Payment'}
+          {!isLoading && <ArrowRight className="h-4 w-4 ml-1 opacity-50" />}
+        </Button>
 
-        {/* Footer */}
-        <div className="text-center pt-4 border-t border-gray-100">
-          <p className="text-xs text-gray-400">
-            Powered by{' '}
-            <span className="font-semibold text-gray-600">BetterPay</span>
-          </p>
+        {/* Footer info */}
+        <div className="flex items-center justify-center gap-2 pt-2 opacity-50">
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+            Tempo Decentralized Protocol
+          </span>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }

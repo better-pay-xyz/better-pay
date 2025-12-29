@@ -39,8 +39,32 @@ export default async function PaymentLinkPage({ params }: Props) {
   await incrementViewCount(linkId)
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center p-4">
-      <PaymentLinkCheckout link={link} />
+    <div className="min-h-screen bg-slate-50 relative overflow-hidden flex items-center justify-center p-4">
+      {/* Background decoration */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+      </div>
+
+      <div className="relative z-10 w-full max-w-sm animate-fade-in">
+        <div className="flex items-center justify-center gap-2 mb-8">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
+            <span className="text-white font-bold text-xl">B</span>
+          </div>
+          <span className="text-xl font-bold tracking-tight text-slate-900">BetterPay</span>
+        </div>
+        <PaymentLinkCheckout link={link} />
+        
+        <div className="mt-8 text-center">
+          <div className="flex items-center justify-center gap-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+            <span>Secure</span>
+            <div className="w-1 h-1 rounded-full bg-slate-300" />
+            <span>Encrypted</span>
+            <div className="w-1 h-1 rounded-full bg-slate-300" />
+            <span>Global</span>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
